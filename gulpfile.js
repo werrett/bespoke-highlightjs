@@ -3,18 +3,17 @@ var gulp = require('gulp'),
   jshint = require('gulp-jshint'),
   map = require('vinyl-map'),
   istanbul = require('istanbul'),
-  karma = require('gulp-karma'),
+  Karma = require('karma').Server,
   coveralls = require('gulp-coveralls'),
   header = require('gulp-header'),
   rename = require('gulp-rename'),
   uglify = require('gulp-uglify'),
   pkg = require('./package.json'),
-  browserify = require('browserify'),
+  Browserify = require('browserify'),
   stringify = require('stringify'),
   source = require('vinyl-source-stream'),
   buffer = require('vinyl-buffer'),
-  path = require('path'),
-  template = require('lodash').template;
+  path = require('path');
 
 gulp.task('default', ['clean', 'lint', 'compile']);
 gulp.task('dev', ['compile', 'lint', 'watch']);
@@ -46,8 +45,10 @@ gulp.task('instrument', ['clean'], function() {
 });
 
 gulp.task('test', ['instrument'], function() {
-  return gulp.src(['test/spec/*Spec.js'])
-    .pipe(karma({ configFile: 'karma.conf.js' }));
+  new Karma({
+    configFile: __dirname + '/karma.conf.js',
+    singleRun: true
+  }).start();
 });
 
 gulp.task('coveralls', ['test'], function() {
@@ -56,30 +57,38 @@ gulp.task('coveralls', ['test'], function() {
 });
 
 gulp.task('compile', ['clean'], function() {
-  return browserify('./lib/bespoke-highlightjs.js')
-    .transform(stringify, {
-      appliesTo: { includeExtensions: ['.css'] },
-      global: true
-    })
-    .bundle({ standalone: 'bespoke.plugins.highlightjs' })
+
+  var b = new Browserify({ standalone: 'bespoke.plugins.highlightjs' });
+  b.transform(stringify, {
+    appliesTo: { includeExtensions: ['.css'] },
+    global: true
+  });
+  b.add('./lib/bespoke-highlightjs.js');
+
+  var longHeader = [
+    '/*!',
+    ' * <%= pkg.name %> v<%= pkg.version %>',
+    ' *',
+    ' * Copyright <%= new Date().getFullYear() %>, <%= pkg.author.name %>',
+    ' * This content is released under the <%= pkg. licenses[0].type %> license',
+    ' * <%= pkg.licenses[0].url %>',
+    ' */\n\n'
+     ].join('\n');
+
+  var shortHeader = [
+    '/*! <%= pkg.name %> v<%= pkg.version %> ',
+    '© <%= new Date().getFullYear() %> <%= pkg.author.name %>, ',
+    '<%= pkg.licenses[0].type %> License */\n'
+    ].join('');
+
+  return b.bundle()
     .pipe(source('bespoke-highlightjs.js'))
     .pipe(buffer())
-    .pipe(header(template([
-      '/*!',
-      ' * <%= name %> v<%= version %>',
-      ' *',
-      ' * Copyright <%= new Date().getFullYear() %>, <%= author.name %>',
-      ' * This content is released under the <%= licenses[0].type %> license',
-      ' * <%= licenses[0].url %>',
-      ' */\n\n'
-    ].join('\n'), pkg)))
+    .pipe(header(longHeader, { pkg : pkg }))
+    .pipe(rename('bespoke-highlightjs.js'))
     .pipe(gulp.dest('dist'))
     .pipe(rename('bespoke-highlightjs.min.js'))
     .pipe(uglify())
-    .pipe(header(template([
-      '/*! <%= name %> v<%= version %> ',
-      '© <%= new Date().getFullYear() %> <%= author.name %>, ',
-      '<%= licenses[0].type %> License */\n'
-    ].join(''), pkg)))
+    .pipe(header(shortHeader, { pkg : pkg }))
     .pipe(gulp.dest('dist'));
 });
