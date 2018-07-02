@@ -8,6 +8,7 @@
     "name": "Jonathan Werrett",
     "url": "https://github.com/werrett"
   },
+  "license": "MIT",
   "main": "./dist/bespoke-highlightjs.min.js",
   "repository": {
     "type": "git",
