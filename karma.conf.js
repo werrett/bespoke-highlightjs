@@ -16,7 +16,8 @@ module.exports = function(config) {
 
     browserify: {
       transform: [
-        ['stringify', { extensions: ['.css'], global: true }]
+        ['stringify', { extensions: ['.css'], global: true }],
+        'browserify-istanbul'
       ],
     },
 

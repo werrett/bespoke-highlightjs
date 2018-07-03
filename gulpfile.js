@@ -1,8 +1,7 @@
 var gulp = require('gulp'),
   clean = require('gulp-clean'),
   jshint = require('gulp-jshint'),
-  map = require('vinyl-map'),
-  istanbul = require('istanbul'),
+  istanbul = require('gulp-istanbul'),
   karma = require('karma'),
   coveralls = require('gulp-coveralls'),
   header = require('gulp-header'),
@@ -12,8 +11,7 @@ var gulp = require('gulp'),
   Browserify = require('browserify'),
   stringify = require('stringify'),
   source = require('vinyl-source-stream'),
-  buffer = require('vinyl-buffer'),
-  path = require('path');
+  buffer = require('vinyl-buffer');
 
 gulp.task('default', ['clean', 'lint', 'test', 'compile']);
 gulp.task('dev', ['compile', 'lint', 'test', 'watch']);
@@ -44,7 +42,13 @@ gulp.task('lint', function() {
 //     .pipe(gulp.dest('lib-instrumented'));
 // });
 
-gulp.task('test', function (done) {
+gulp.task('pre-test', ['clean'], function() {
+  return gulp.src(['lib/**/*.js'])
+    .pipe(istanbul())
+    .pipe(gulp.dest('test-tmp/'));
+});
+
+gulp.task('test', ['pre-test'], function (done) {
   new karma.Server({ configFile: __dirname + '/karma.conf.js', singleRun: true })
     // prevent karma from calling process.exit
     .on('run_complete', function() { done(); })

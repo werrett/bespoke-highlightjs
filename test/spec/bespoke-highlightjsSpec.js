@@ -1,7 +1,7 @@
 Function.prototype.bind = Function.prototype.bind || require('function-bind');
 
 var bespoke = require('bespoke'),
-    highlightjs = require('../../lib/bespoke-highlightjs.js');
+    highlightjs = require('../../test-tmp/bespoke-highlightjs.js');
 
 describe("bespoke-highlightjs", function() {
 
