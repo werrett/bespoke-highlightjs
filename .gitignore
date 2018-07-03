@@ -1,4 +1,16 @@
-node_modules
-bower_components
+# Temp files
+*~
+*#
+.#*
+\#*#
+.*.sw[a-z]
+*.un~
+
+# OSX
+.DS_Store
+
+# NodeJS build artifacts
+node_modules/
+bower_components/
 test-tmp/
 test/coverage
