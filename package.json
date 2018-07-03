@@ -41,6 +41,7 @@
     "karma-coverage": "^1.1.2",
     "karma-jasmine": "^1.1.2",
     "karma-phantomjs-launcher": "^1.0.4",
+    "phantomjs-prebuilt": "^2.1.16",
     "stringify": "^5.2.0",
     "vinyl-buffer": "1.0.1",
     "vinyl-source-stream": "^2.0.0"
@@ -61,7 +62,6 @@
     "highlightjs": "^9.10.0",
     "jasmine-core": "^3.1.0",
     "jshint-stylish": "^2.2.1",
-    "phantomjs": "^2.1.7",
     "watchify": "^3.11.0"
   }
 }

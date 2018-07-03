@@ -31,7 +31,7 @@ module.exports = function(config) {
       ]
     },
 
-    port: 8080,
+    port: 10080,
 
     logLevel: config.LOG_INFO,
 
