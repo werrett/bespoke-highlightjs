@@ -1,35 +1,53 @@
 Function.prototype.bind = Function.prototype.bind || require('function-bind');
 
-var bespoke = require('bespoke');
-var highlightjs = require('../../lib-instrumented/bespoke-highlightjs.js');
+var bespoke = require('bespoke'),
+    highlightjs = require('../../lib/bespoke-highlightjs.js');
 
 describe("bespoke-highlightjs", function() {
 
   var deck,
-
     createDeck = function() {
-      var parent = document.createElement('article');
-      for (var i = 0; i < 10; i++) {
-        parent.appendChild(document.createElement('section'));
-      }
+      var parent = document.createElement('article'),
+        sectionOne = document.createElement('section');
 
-      deck = bespoke.from(parent, [
+      sectionOne.innerHTML = [
+        '<pre><code class="javascript">',
+        '/**',
+        '* @author John Smith',
+        '*/',
+        'function foobar(text) {',
+        '  console.log(text);',
+        '}',
+        '</code></pre>'
+      ].join('\n');
+
+      parent.appendChild(sectionOne);
+      document.body.appendChild(parent);
+
+      deck = bespoke.from({ parent: 'article', slides: 'section' }, [
         highlightjs()
       ]);
     };
 
   beforeEach(createDeck);
 
-  describe("deck.slide", function() {
+  it('should inject HighlightJS styles', function() {
+    var firstStyleElement = document.head.querySelector('style');
+    expect(firstStyleElement.innerHTML).toContain('hljs');
+  });
 
-    beforeEach(function() {
-      deck.slide(0);
-    });
-
-    it("should not add a useless 'foobar' class to the slide", function() {
-      expect(deck.slides[0].classList.contains('foobar')).toBe(false);
-    });
-
+  it('should insert <span>s with HighlightJS', function() {
+    var section = deck.parent.querySelectorAll('section')[0];
+    expect(section.innerHTML).toBe([
+      '<pre><code class="javascript hljs">',
+      '<span class="hljs-comment">/**',
+      '* @author John Smith',
+      '*/</span>',
+      '<span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">foobar</span>(<span class="hljs-params">text</span>) </span>{',
+      '  <span class="hljs-built_in">console</span>.log(text);',
+      '}',
+      '</code></pre>'
+    ].join('\n'));
   });
 
 });

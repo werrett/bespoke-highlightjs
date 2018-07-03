@@ -5,7 +5,7 @@ module.exports = function(config) {
     frameworks: ['jasmine', 'browserify'],
 
     files: [
-      'test/spec/*Spec.js'
+      'test/spec/bespoke-highlightjsSpec.js'
     ],
 
     exclude: [],
@@ -14,11 +14,20 @@ module.exports = function(config) {
       'test/**/*.js': 'browserify'
     },
 
+    browserify: {
+      transform: [
+        ['stringify', { extensions: ['.css'], global: true }]
+      ],
+    },
+
     reporters: ['progress', 'coverage'],
 
     coverageReporter: {
-      type : 'lcov',
-      dir : 'test/coverage'
+      dir : 'test/coverage',
+      reporters: [
+        { type: 'lcov' },
+        { type: 'json' }
+      ]
     },
 
     port: 8080,
@@ -27,8 +36,6 @@ module.exports = function(config) {
 
     autoWatch: false,
 
-    browsers: ['PhantomJS'],
-
-    singleRun: true
+    browsers: ['PhantomJS']
   });
 };

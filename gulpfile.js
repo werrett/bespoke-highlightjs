@@ -3,7 +3,7 @@ var gulp = require('gulp'),
   jshint = require('gulp-jshint'),
   map = require('vinyl-map'),
   istanbul = require('istanbul'),
-  Karma = require('karma').Server,
+  karma = require('karma'),
   coveralls = require('gulp-coveralls'),
   header = require('gulp-header'),
   rename = require('gulp-rename'),
@@ -15,8 +15,8 @@ var gulp = require('gulp'),
   buffer = require('vinyl-buffer'),
   path = require('path');
 
-gulp.task('default', ['clean', 'lint', 'compile']);
-gulp.task('dev', ['compile', 'lint', 'watch']);
+gulp.task('default', ['clean', 'lint', 'test', 'compile']);
+gulp.task('dev', ['compile', 'lint', 'test', 'watch']);
 
 gulp.task('watch', function() {
   gulp.watch('lib/**/*.js', ['test', 'lint', 'compile']);
@@ -34,21 +34,21 @@ gulp.task('lint', function() {
     .pipe(jshint.reporter('jshint-stylish'));
 });
 
-gulp.task('instrument', ['clean'], function() {
-  return gulp.src('lib/**/*.js')
-    .pipe(map(function(code, filename) {
-      var instrumenter = new istanbul.Instrumenter(),
-        relativePath = path.relative(__dirname, filename);
-      return instrumenter.instrumentSync(code.toString(), relativePath);
-    }))
-    .pipe(gulp.dest('lib-instrumented'));
-});
+// gulp.task('instrument', ['clean'], function() {
+//   return gulp.src('lib/**/*.js')
+//     .pipe(map(function(code, filename) {
+//       var instrumenter = new istanbul.Instrumenter(),
+//         relativePath = path.relative(__dirname, filename);
+//       return instrumenter.instrumentSync(code.toString(), relativePath);
+//     }))
+//     .pipe(gulp.dest('lib-instrumented'));
+// });
 
-gulp.task('test', ['instrument'], function() {
-  new Karma({
-    configFile: __dirname + '/karma.conf.js',
-    singleRun: true
-  }).start();
+gulp.task('test', function (done) {
+  new karma.Server({ configFile: __dirname + '/karma.conf.js', singleRun: true })
+    // prevent karma from calling process.exit
+    .on('run_complete', function() { done(); })
+    .start();
 });
 
 gulp.task('coveralls', ['test'], function() {
