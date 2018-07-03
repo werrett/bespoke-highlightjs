@@ -22,7 +22,7 @@ gulp.task('watch', function() {
 });
 
 gulp.task('clean', function() {
-  return gulp.src(['dist', 'lib-instrumented', 'test/coverage'], { read: false })
+  return gulp.src(['dist', 'test-tmp', 'test/coverage'], { read: false })
     .pipe(clean());
 });
 
@@ -31,16 +31,6 @@ gulp.task('lint', function() {
     .pipe(jshint('.jshintrc'))
     .pipe(jshint.reporter('jshint-stylish'));
 });
-
-// gulp.task('instrument', ['clean'], function() {
-//   return gulp.src('lib/**/*.js')
-//     .pipe(map(function(code, filename) {
-//       var instrumenter = new istanbul.Instrumenter(),
-//         relativePath = path.relative(__dirname, filename);
-//       return instrumenter.instrumentSync(code.toString(), relativePath);
-//     }))
-//     .pipe(gulp.dest('lib-instrumented'));
-// });
 
 gulp.task('pre-test', ['clean'], function() {
   return gulp.src(['lib/**/*.js'])
